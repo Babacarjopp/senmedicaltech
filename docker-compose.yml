@@ -1,0 +1,92 @@
+version: "3.8"
+
+# Variables à définir dans .env (copier depuis .env.example)
+# JWT_SECRET, MONGO_USER, MONGO_PASSWORD, REACT_APP_API_URL, CORS_ORIGIN, NODE_ENV
+
+services:
+  # ── MongoDB ──
+  mongo:
+    image: mongo:6
+    container_name: SenMedicaltech-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-changeme_production}
+      MONGO_INITDB_DATABASE: orthopedic_shop
+    volumes:
+      - mongo-data:/data/db
+      - mongo-logs:/var/log/mongodb
+    networks:
+      - SenMedicaltech-net
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # ── Backend (Express) ──
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: SenMedicaltech-backend
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      MONGO_URI: "mongodb://${MONGO_USER:-admin}:${MONGO_PASSWORD:-changeme_production}@mongo:27017/orthopedic_shop?authSource=admin"
+      JWT_SECRET: ${JWT_SECRET}
+      PORT: 5000
+      NODE_ENV: ${NODE_ENV:-production}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    depends_on:
+      mongo:
+        condition: service_healthy
+    volumes:
+      - ./backend/logs:/app/logs
+    networks:
+      - SenMedicaltech-net
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:5000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  # ── Frontend (React + Nginx) ──
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        REACT_APP_API_URL: ${REACT_APP_API_URL:-http://localhost:5000/api}
+    container_name: SenMedicaltech-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost/"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - SenMedicaltech-net
+
+# ── Volumes & Networks ──
+volumes:
+  mongo-data:
+    driver: local
+  mongo-logs:
+    driver: local
+
+networks:
+  SenMedicaltech-net:
+    driver: bridge

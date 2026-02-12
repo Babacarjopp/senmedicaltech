@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+
+# Environment variables (NEVER commit secrets!)
+.env
+.env.local
+.env.*.local
+.env.staging        # Staging secrets (use secret manager in CI/CD)
+.env.production     # Production secrets (use secret manager in CI/CD)
+
+# Build output
+frontend/build/
+dist/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Docker (optional, uncomment if needed)
+# docker-compose.override.yml
+
+# CI/CD artifacts
+.github/secrets/
+.env.*.secret
