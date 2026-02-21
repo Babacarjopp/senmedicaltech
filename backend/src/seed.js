@@ -107,7 +107,7 @@ const sampleProducts = [
 
 const adminUser = {
   name: "Admin Test",
-  email: "admin@orthoshop.com",
+  email: "admin@senmedicaltech.com",
   password: "admin123", // sera hashé automatiquement par le middleware pre-save
   role: "admin",
 };

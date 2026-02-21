@@ -5,41 +5,80 @@ const Product = require("../models/Product");
 const { protect, adminOnly } = require("../middleware/auth");
 const { validateOrder } = require("../middleware/validation");
 
+// ── Fonction utilitaire pour créer une commande ──
+const createOrder = async ({ items, shippingAddress, paymentMethod, userId, guestEmail }) => {
+  // Calculer le prix total & vérifier le stock
+  let totalPrice = 0;
+  const orderItems = [];
+
+  for (const item of items) {
+    const product = await Product.findById(item.product);
+    if (!product) {
+      throw new Error(`Produit ${item.product} non trouvé.`);
+    }
+    if (product.stock < item.quantity) {
+      throw new Error(`Stock insuffisant pour : ${product.name}`);
+    }
+
+    totalPrice += product.price * item.quantity;
+    orderItems.push({
+      product: item.product,
+      quantity: item.quantity,
+      price: product.price,
+    });
+
+    // Diminuer le stock
+    product.stock -= item.quantity;
+    product.inStock = product.stock > 0;
+    await product.save();
+  }
+
+  const orderData = {
+    items: orderItems,
+    totalPrice,
+    shippingAddress,
+    paymentMethod,
+  };
+
+  if (userId) {
+    orderData.user = userId;
+  }
+  if (guestEmail) {
+    orderData.guestEmail = guestEmail;
+  }
+
+  return Order.create(orderData);
+};
+
 // POST /api/orders — Créer une commande (utilisateur connecté)
 router.post("/", protect, validateOrder, async (req, res) => {
   try {
     const { items, shippingAddress, paymentMethod } = req.body;
-
-    // Calculer le prix total & vérifier le stock
-    let totalPrice = 0;
-    for (const item of items) {
-      const product = await Product.findById(item.product);
-      if (!product) {
-        return res.status(404).json({ message: `Produit ${item.product} non trouvé.` });
-      }
-      if (product.stock < item.quantity) {
-        return res.status(400).json({ message: `Stock insuffisant pour : ${product.name}` });
-      }
-      totalPrice += product.price * item.quantity;
-
-      // Diminuer le stock
-      product.stock -= item.quantity;
-      product.inStock = product.stock > 0;
-      await product.save();
-    }
-
-    const order = await Order.create({
-      user: req.user._id,
-      items: items.map((item) => ({
-        product: item.product,
-        quantity: item.quantity,
-        price: totalPrice / items.length, // prix unitaire medio (on peut affiner)
-      })),
-      totalPrice,
+    const order = await createOrder({
+      items,
       shippingAddress,
       paymentMethod,
+      userId: req.user._id,
     });
+    res.status(201).json(order);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
 
+// POST /api/orders/guest — Créer une commande invité
+router.post("/guest", validateOrder, async (req, res) => {
+  try {
+    const { items, shippingAddress, paymentMethod, guestEmail } = req.body;
+    if (!guestEmail) {
+      return res.status(400).json({ message: "Email requis pour les commandes invité." });
+    }
+    const order = await createOrder({
+      items,
+      shippingAddress,
+      paymentMethod,
+      guestEmail,
+    });
     res.status(201).json(order);
   } catch (err) {
     res.status(400).json({ message: err.message });

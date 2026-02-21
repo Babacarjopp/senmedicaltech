@@ -150,7 +150,7 @@ curl -H "Content-Type: application/json" https://api.SenMedicaltech.com/api/heal
 # Tester auth
 curl -X POST https://api.orthoshop.com/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"admin@orthoshop.com","password":"ADMIN_PASSWORD"}'
+  -d '{"email":"admin@senmedicaltech.com","password":"ADMIN_PASSWORD"}'
 
 # Vérifier rate limiting
 for i in {1..10}; do curl https://api.orthoshop.com/api/auth/login; done

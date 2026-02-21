@@ -1,5 +1,7 @@
 const express = require("express");
 const dotenv = require("dotenv");
+const fs = require("fs");
+const path = require("path");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const mongoSanitize = require("express-mongo-sanitize");
@@ -11,7 +13,11 @@ const productRoutes = require("./routes/products");
 const orderRoutes = require("./routes/orders");
 
 // ── Init ──
-dotenv.config({ path: require("path").join(__dirname, "..", ".env") });
+// Charge .env depuis la racine si présent, sinon fallback sur backend/.env
+const rootEnvPath = path.join(__dirname, "..", "..", ".env");
+const backendEnvPath = path.join(__dirname, "..", ".env");
+const envPath = fs.existsSync(rootEnvPath) ? rootEnvPath : backendEnvPath;
+dotenv.config({ path: envPath });
 const app = express();
 const PORT = process.env.PORT || 5000;
 
