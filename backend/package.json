@@ -1,5 +1,5 @@
 {
-  "name": "orthopedic-shop-backend",
+  "name": "senmedicaltech-shop-backend",
   "version": "1.0.0",
   "description": "API Backend - Boutique Orthopédique",
   "main": "src/app.js",

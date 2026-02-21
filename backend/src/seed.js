@@ -128,7 +128,7 @@ async function seed() {
 
     // Insérer admin (via create pour déclencher le middleware pre-save → hash du mdp)
     await User.create(adminUser);
-    console.log("👤 Admin créé → email: admin@orthoshop.com | mdp: admin123");
+    console.log("👤 Admin créé → email: admin@senmedicaltech.com | mdp: admin123");
 
     await mongoose.disconnect();
     console.log("\n✅ Seeder terminé avec succès !");

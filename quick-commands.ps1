@@ -2,7 +2,7 @@
 # Usage: .\quick-commands.ps1 [command]
 
 function Show-Commands {
-    Write-Host "🏥 Orthopedic Shop - Quick Commands" -ForegroundColor Cyan
+    Write-Host "🏥  Shop - Quick Commands" -ForegroundColor Cyan
     Write-Host "====================================" -ForegroundColor Cyan
     Write-Host ""
     
@@ -26,7 +26,7 @@ function Show-Commands {
     Write-Host ""
     
     Write-Host "🔑 Authentication:" -ForegroundColor Green
-    Write-Host "  Admin Email:    admin@orthoshop.com"
+    Write-Host "  Admin Email:    admin@senmedicaltech.com"
     Write-Host "  Admin Password: admin123"
     Write-Host ""
     

@@ -41,7 +41,7 @@ curl http://localhost:5000/api/health
 
 | Account | Email | Password |
 |---------|-------|----------|
-| Admin | admin@orthoshop.com | admin123 |
+| Admin | admin@senmedicaltech.com | admin123 |
 | Test User | test@test.com | Test123! |
 
 ---
