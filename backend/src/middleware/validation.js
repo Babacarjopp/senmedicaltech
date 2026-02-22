@@ -108,7 +108,8 @@ const validateOrder = [
     .notEmpty().withMessage("Le pays est obligatoire"),
   
   body("paymentMethod")
-    .isIn(["Carte", "Virement", "Espèces"]).withMessage("Méthode de paiement invalide"),
+  // .isIn(["Carte", "Virement", "Espèces"]).withMessage("Méthode de paiement invalide"),pour plus tard si on veut integrer d'autres méthodes de paiement, on peut enlever cette validation stricte et juste vérifier que ce n'est pas vide
+    .isIn([ "Espèces"]).withMessage("Méthode de paiement invalide"),
   
   validate
 ];

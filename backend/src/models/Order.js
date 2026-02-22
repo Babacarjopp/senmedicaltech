@@ -54,8 +54,11 @@ const orderSchema = new mongoose.Schema(
     },
     paymentMethod: {
       type: String,
-      enum: ["Carte", "Virement", "Espèces"],
-      default: "Carte",
+      /*
+        enum: ["Carte", "Virement", "Espèces"],// Pour plus tard si on veut integrer d'autres méthodes de paiement comme carte et virement mais pour le momment c espece seulement, on peut enlever cette validation stricte et juste vérifier que ce n'est pas vide
+        default: "Carte",
+      */
+     
     },
   },
   { timestamps: true }
