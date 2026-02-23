@@ -66,7 +66,7 @@ senmedicaltech-shop/
 │   │   │   ├── CheckoutPage.js   → Checkout / Commande
 │   │   │   ├── LoginPage.js      → Connexion
 │   │   │   ├── RegisterPage.js   → Inscription
-│   │   │   └── DashboardPage.js  → Admin dashboard
+│   │   │   └── DashboardPage.js  → hboard
 │   │   ├── utils/api.js          → Instance Axios
 │   │   ├── App.js                → Router principal
 │   │   ├── index.js              → Point d'entrée

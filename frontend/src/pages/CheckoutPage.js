@@ -19,7 +19,9 @@ const CheckoutPage = () => {
     postal: user?.address?.postal || "",
     country: user?.address?.country || "Sénégal",
   });
-  const [paymentMethod, setPaymentMethod] = useState("Carte");
+  // --- MÉTHODE DE PAIEMENT : pour réintégrer Carte + Virement, décommenter la ligne ci-dessous et commenter la suivante ---
+  // const [paymentMethod, setPaymentMethod] = useState("Carte");
+  const paymentMethod = "Espèces"; // Paiement uniquement espèces pour le moment
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -189,6 +191,8 @@ const CheckoutPage = () => {
           {/* Méthode de paiement */}
           <div className="card p-6">
             <h2 className="text-lg font-bold text-neutral-800 mb-4">💳 Méthode de paiement</h2>
+            {/* --- Pour réintégrer Carte + Virement : décommenter le bloc ci-dessous et commenter le bloc "Espèces uniquement" --- */}
+            {/*
             <div className="grid grid-cols-3 gap-3">
               {["Carte", "Virement", "Espèces"].map((method) => (
                 <button
@@ -206,6 +210,12 @@ const CheckoutPage = () => {
                   {method}
                 </button>
               ))}
+            </div>
+            */}
+            {/* Espèces uniquement - commenter ce bloc pour réactiver Carte + Virementsssss */}
+            <div className="flex items-center gap-3 p-4 rounded-xl border-2 border-primary-500 bg-primary-50 text-primary-600">
+              <span className="text-2xl">💵</span>
+              <span className="font-semibold">Paiement à la livraison en espèces</span>
             </div>
           </div>
 
