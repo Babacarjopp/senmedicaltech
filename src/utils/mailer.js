@@ -1,6 +1,8 @@
+require("dotenv").config();
 const sgMail = require("@sendgrid/mail");
 const nodemailer = require("nodemailer");
 const logger = require("../config/logger");
+
 
 /**
  * MailerService — Multi-provider email service
@@ -42,15 +44,16 @@ if (useProvider === "sendgrid" && process.env.SENDGRID_API_KEY) {
   };
 } else {
   // ─── Nodemailer Configuration (Staging/Dev) ───
-  const transporter = nodemailer.createTransport({
-    host: process.env.MAIL_HOST || "smtp.mailtrap.io",
-    port: process.env.MAIL_PORT ? parseInt(process.env.MAIL_PORT, 10) : 587,
-    secure: false,
-    auth: process.env.MAIL_USER && process.env.MAIL_PASS 
-      ? { user: process.env.MAIL_USER, pass: process.env.MAIL_PASS } 
-      : undefined,
-  });
-
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST,
+  port: 587,
+  secure: false,
+  requireTLS: true,
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+});
   logger.info(`📧 Mail provider: Nodemailer (${process.env.MAIL_HOST || "mailtrap"})`);
 
   mailer = {
