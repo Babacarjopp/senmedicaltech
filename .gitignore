@@ -7,6 +7,7 @@ node_modules/
 .env.*.local
 .env.staging        # Staging secrets (use secret manager in CI/CD)
 .env.production     # Production secrets (use secret manager in CI/CD)
+backend/.env.production
 
 # Build output
 frontend/build/
