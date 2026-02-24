@@ -1,3 +1,4 @@
+const { sendOrderConfirmation } = require("../utils/mailer");
 const express = require("express");
 const router = express.Router();
 const Order = require("../models/Order");
@@ -7,7 +8,6 @@ const { validateOrder } = require("../middleware/validation");
 
 // ── Fonction utilitaire pour créer une commande ──
 const createOrder = async ({ items, shippingAddress, paymentMethod, userId, guestEmail }) => {
-  // Calculer le prix total & vérifier le stock
   let totalPrice = 0;
   const orderItems = [];
 
@@ -27,7 +27,6 @@ const createOrder = async ({ items, shippingAddress, paymentMethod, userId, gues
       price: product.price,
     });
 
-    // Diminuer le stock
     product.stock -= item.quantity;
     product.inStock = product.stock > 0;
     await product.save();
@@ -40,12 +39,8 @@ const createOrder = async ({ items, shippingAddress, paymentMethod, userId, gues
     paymentMethod,
   };
 
-  if (userId) {
-    orderData.user = userId;
-  }
-  if (guestEmail) {
-    orderData.guestEmail = guestEmail;
-  }
+  if (userId) orderData.user = userId;
+  if (guestEmail) orderData.guestEmail = guestEmail;
 
   return Order.create(orderData);
 };
@@ -60,6 +55,12 @@ router.post("/", protect, validateOrder, async (req, res) => {
       paymentMethod,
       userId: req.user._id,
     });
+
+    // ne pas bloquer la réponse si le mail échoue
+    sendOrderConfirmation(order).catch((err) =>
+      console.error("Erreur envoi mail confirmation:", err.message)
+    );
+
     res.status(201).json(order);
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -73,12 +74,18 @@ router.post("/guest", validateOrder, async (req, res) => {
     if (!guestEmail) {
       return res.status(400).json({ message: "Email requis pour les commandes invité." });
     }
+
     const order = await createOrder({
       items,
       shippingAddress,
       paymentMethod,
       guestEmail,
     });
+
+    sendOrderConfirmation(order).catch((err) =>
+      console.error("Erreur envoi mail confirmation:", err.message)
+    );
+
     res.status(201).json(order);
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -115,9 +122,7 @@ router.put("/:id/status", protect, adminOnly, async (req, res) => {
   try {
     const { status } = req.body;
     const order = await Order.findByIdAndUpdate(req.params.id, { status }, { new: true });
-    if (!order) {
-      return res.status(404).json({ message: "Commande non trouvée." });
-    }
+    if (!order) return res.status(404).json({ message: "Commande non trouvée." });
     res.json(order);
   } catch (err) {
     res.status(400).json({ message: err.message });
