@@ -57,7 +57,7 @@ router.post("/", protect, validateOrder, async (req, res) => {
     });
 
     // ne pas bloquer la réponse si le mail échoue
-    sendOrderConfirmation(order).catch((err) =>
+    sendOrderConfirmation(order, req.user.email).catch((err) =>
       console.error("Erreur envoi mail confirmation:", err.message)
     );
 
@@ -82,10 +82,10 @@ router.post("/guest", validateOrder, async (req, res) => {
       guestEmail,
     });
 
-    sendOrderConfirmation(order).catch((err) =>
+    // => on passe l'email invité (optionnel mais plus sûr)
+    sendOrderConfirmation(order, guestEmail).catch((err) =>
       console.error("Erreur envoi mail confirmation:", err.message)
     );
-
     res.status(201).json(order);
   } catch (err) {
     res.status(400).json({ message: err.message });
