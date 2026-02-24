@@ -25,7 +25,7 @@ if (useProvider === "sendgrid" && process.env.SENDGRID_API_KEY) {
       try {
         const msg = {
           to,
-          from: process.env.MAIL_FROM || "noreply@senmedicaltech.com",
+          from: process.env.EMAIL_FROM || process.env.MAIL_FROM || "noreply@senmedicaltech.com",
           subject,
           text,
           html,
@@ -45,23 +45,23 @@ if (useProvider === "sendgrid" && process.env.SENDGRID_API_KEY) {
 } else {
   // ─── Nodemailer Configuration (Staging/Dev) ───
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: 587,
+  host: process.env.SMTP_HOST || process.env.MAIL_HOST,
+  port: parseInt(process.env.SMTP_PORT || process.env.MAIL_PORT || "587"),
   secure: false,
   requireTLS: true,
   auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
+    user: process.env.SMTP_USER || process.env.MAIL_USER,
+    pass: process.env.SMTP_PASS || process.env.MAIL_PASS,
   },
 });
-  logger.info(`📧 Mail provider: Nodemailer (${process.env.MAIL_HOST || "mailtrap"})`);
+  logger.info(`📧 Mail provider: Nodemailer (${process.env.SMTP_HOST || process.env.MAIL_HOST || "mailtrap"})`);
 
   mailer = {
     name: "Nodemailer",
     send: async (to, subject, text, html) => {
       try {
         const msg = {
-          from: process.env.MAIL_FROM || "noreply@orthoshop.local",
+          from: process.env.EMAIL_FROM || process.env.MAIL_FROM || "noreply@orthoshop.local",
           to,
           subject,
           text,
