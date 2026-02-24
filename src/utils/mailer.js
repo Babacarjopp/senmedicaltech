@@ -61,7 +61,7 @@ const transporter = nodemailer.createTransport({
     send: async (to, subject, text, html) => {
       try {
         const msg = {
-          from: process.env.MAIL_FROM || "noreply@orthoshop.local",
+          from: process.env.MAIL_FROM || "noreply@senmedicaltech.local",
           to,
           subject,
           text,
